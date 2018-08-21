@@ -1,0 +1,29 @@
+disabled_rules:
+  - missing_docs
+  - todo
+  - trailing_comma
+opt_in_rules:
+  - empty_count
+  - force_unwrapping
+  - missing_docs
+included:
+  - Sources
+  - Tests
+line_length: 110
+type_body_length:
+  - 300
+  - 400
+file_length:
+  warning: 500
+  error: 1200
+type_name:
+  min_length:
+    error: 3
+  max_length:
+    error: 50
+variable_name:
+  min_length:
+    error: 3
+  excluded:
+    - id
+reporter: "xcode"

@@ -3,7 +3,9 @@ import SQLite
 import XCTest
 
 #if os(macOS)
-let pathToTestDB = Bundle(for: FireflyTests.self).path(forResource: "firefly", ofType: "sqlite") ?? Bundle(for: FireflyTests.self).bundlePath
+// swiftlint:disable force_unwrapping
+let pathToTestDB = Bundle(for: FireflyTests.self).path(forResource: "firefly", ofType: "sqlite")!
+// swiftlint:enable force_unwrapping
 #else
 let pathToTestDB = "Tests/SQLiteTests/firefly.sqlite"
 #endif
