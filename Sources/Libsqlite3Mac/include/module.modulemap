@@ -1,0 +1,5 @@
+module Libsqlite3Mac [system] {
+	header "/usr/local/opt/sqlite/include/sqlite3.h"
+	link "sqlite3"
+	export *
+}
