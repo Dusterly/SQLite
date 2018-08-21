@@ -17,6 +17,10 @@ function display_result {
 	fi
 }
 
+if [[ "$(docker images -q sqlite3_dev 2> /dev/null)" == "" ]]; then
+	docker build -f sqlite3.dockerfile -t sqlite3_dev .
+fi
+
 docker build -f test.dockerfile -t test_run .
 
 result=$?
