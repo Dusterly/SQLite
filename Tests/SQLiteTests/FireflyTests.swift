@@ -59,6 +59,18 @@ class FireflyTests: XCTestCase {
 		XCTAssertNil(connection.scalar(executing: "select null") as Data?)
 	}
 
+	func testCanReturnRows() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result = try connection.resultSet(executing: "select * from Crew")
+
+		XCTAssertEqual(result.count, 8)
+
+		guard let row = result.first else { return XCTFail("no rows") }
+		XCTAssertEqual(row["name"] as? String, "Mal")
+		XCTAssertEqual(row["role"] as? String, "Captain")
+	}
+
 	static let allTests = [
 		("testThrowsIfDatabaseDoesNotExist", testThrowsIfDatabaseDoesNotExist),
 		("testConnectsToExistingDatabase", testConnectsToExistingDatabase),
@@ -67,5 +79,6 @@ class FireflyTests: XCTestCase {
 		("testHandlesBlob", testHandlesBlob),
 		("testHandlesReal", testHandlesReal),
 		("testHandlesNull", testHandlesNull),
+		("testCanReturnRows", testCanReturnRows),
 	]
 }

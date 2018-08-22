@@ -24,6 +24,18 @@ public class Connection {
 		return ResultRow(stmtPointer: stmtPointer).value(at: 0)
 	}
 
+	public func resultSet(executing query: String) throws -> [[String: ResultValue]] {
+		var result: [[String: ResultValue]] = []
+		let stmtPointer = pointer(preparing: query)
+
+		while sqlite3_step(stmtPointer) == SQLITE_ROW {
+			let row = ResultRow(stmtPointer: stmtPointer)
+			result.append(try row.values())
+		}
+
+		return result
+	}
+
 	private func pointer(preparing query: String) -> OpaquePointer {
 		var stmtPointer: OpaquePointer?
 		sqlite3_prepare_v2(pointer, query, Int32(query.utf8.count), &stmtPointer, nil)
@@ -31,6 +43,7 @@ public class Connection {
 	}
 }
 
-private enum SQLiteError: Error {
+enum SQLiteError: Error {
 	case error
+	case unknown
 }
