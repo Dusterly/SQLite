@@ -22,7 +22,7 @@ class FireflyTests: XCTestCase {
 	func testFindsTheCrew() throws {
 		let connection = try Connection(path: pathToTestDB)
 
-		let result: Int = connection.scalar(executing: "select count(*) from Crew")
+		let result: Int? = connection.scalar(executing: "select count(*) from Crew")
 
 		XCTAssertEqual(result, 8)
 	}
@@ -30,7 +30,7 @@ class FireflyTests: XCTestCase {
 	func testHandlesText() throws {
 		let connection = try Connection(path: pathToTestDB)
 
-		let result: String = connection.scalar(executing: "select 'Hey, Kaylee'")
+		let result: String? = connection.scalar(executing: "select 'Hey, Kaylee'")
 
 		XCTAssertEqual(result, "Hey, Kaylee")
 	}
@@ -38,16 +38,24 @@ class FireflyTests: XCTestCase {
 	func testHandlesBlob() throws {
 		let connection = try Connection(path: pathToTestDB)
 
-		let result: Data = connection.scalar(executing: "select data from TestData where data is not null")
+		let result: Data? = connection.scalar(executing: "select data from TestData where data is not null")
 
 		XCTAssertEqual(result, "data_only".data(using: .ascii))
 	}
 
 	func testHandlesReal() throws {
 		let connection = try Connection(path: pathToTestDB)
-		let result: Double = connection.scalar(executing: "select 3.0")
+		let result: Double? = connection.scalar(executing: "select 3.0")
 
 		XCTAssertEqual(result, 3.0)
+	}
+
+	func testHandlesNull() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result: String? = try connection.scalar(executing: "select null")
+
+		XCTAssertNil(result)
 	}
 
 	static let allTests = [
@@ -57,5 +65,6 @@ class FireflyTests: XCTestCase {
 		("testHandlesText", testHandlesText),
 		("testHandlesBlob", testHandlesBlob),
 		("testHandlesReal", testHandlesReal),
+		("testHandlesNull", testHandlesNull),
 	]
 }

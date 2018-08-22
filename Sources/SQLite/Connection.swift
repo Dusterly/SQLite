@@ -18,9 +18,10 @@ public class Connection {
 		self.pointer = pointer
 	}
 
-	public func scalar<T: ResultValue>(executing query: String) -> T {
+	public func scalar<T: ResultValue>(executing query: String) -> T? {
 		let stmtPointer = pointer(preparing: query)
 		sqlite3_step(stmtPointer)
+		guard sqlite3_column_type(stmtPointer, 0) != SQLITE_NULL else { return nil }
 		return T(stmt: stmtPointer, index: 0)
 	}
 
