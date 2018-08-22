@@ -35,10 +35,27 @@ class FireflyTests: XCTestCase {
 		XCTAssertEqual(result, "Hey, Kaylee")
 	}
 
+	func testHandlesBlob() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result: Data = connection.scalar(executing: "select data from TestData where data is not null")
+
+		XCTAssertEqual(result, "data_only".data(using: .ascii))
+	}
+
+	func testHandlesReal() throws {
+		let connection = try Connection(path: pathToTestDB)
+		let result: Double = connection.scalar(executing: "select 3.0")
+
+		XCTAssertEqual(result, 3.0)
+	}
+
 	static let allTests = [
 		("testThrowsIfDatabaseDoesNotExist", testThrowsIfDatabaseDoesNotExist),
 		("testConnectsToExistingDatabase", testConnectsToExistingDatabase),
 		("testFindsTheCrew", testFindsTheCrew),
 		("testHandlesText", testHandlesText),
+		("testHandlesBlob", testHandlesBlob),
+		("testHandlesReal", testHandlesReal),
 	]
 }
