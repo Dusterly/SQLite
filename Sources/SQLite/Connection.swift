@@ -18,15 +18,21 @@ public class Connection {
 		self.pointer = pointer
 	}
 
-	public func scalar<T: ResultValue>(executing query: String) -> T? {
+	public func scalar<T: ResultValue>(executing query: String, _ parameters: Int...) -> T? {
 		let stmtPointer = pointer(preparing: query)
+		for (index, parameter) in parameters.enumerated() {
+			sqlite3_bind_int64(stmtPointer, Int32(index + 1), Int64(parameter))
+		}
 		sqlite3_step(stmtPointer)
 		return ResultRow(stmtPointer: stmtPointer).value(at: 0)
 	}
 
-	public func resultSet(executing query: String) throws -> [[String: ResultValue]] {
+	public func resultSet(executing query: String, _ parameters: Int...) throws -> [[String: ResultValue]] {
 		var result: [[String: ResultValue]] = []
 		let stmtPointer = pointer(preparing: query)
+		for (index, parameter) in parameters.enumerated() {
+			sqlite3_bind_int64(stmtPointer, Int32(index + 1), Int64(parameter))
+		}
 
 		while sqlite3_step(stmtPointer) == SQLITE_ROW {
 			let row = ResultRow(stmtPointer: stmtPointer)

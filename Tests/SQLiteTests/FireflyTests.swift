@@ -71,6 +71,26 @@ class FireflyTests: XCTestCase {
 		XCTAssertEqual(row["role"] as? String, "Captain")
 	}
 
+	func testHandlesIntegerParameters() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result: Int? = connection.scalar(executing: "select ?", 4)
+
+		XCTAssertEqual(result, 4)
+	}
+
+	func testHandlesIntegerParameters_2() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result = try connection.resultSet(executing: "select * from Crew where id = ?", 4)
+
+		XCTAssertEqual(result.count, 1)
+
+		guard let row = result.first else { return XCTFail("no rows") }
+		XCTAssertEqual(row["name"] as? String, "Kaylee")
+		XCTAssertEqual(row["role"] as? String, "Mechanic")
+	}
+
 	static let allTests = [
 		("testThrowsIfDatabaseDoesNotExist", testThrowsIfDatabaseDoesNotExist),
 		("testConnectsToExistingDatabase", testConnectsToExistingDatabase),
@@ -80,5 +100,7 @@ class FireflyTests: XCTestCase {
 		("testHandlesReal", testHandlesReal),
 		("testHandlesNull", testHandlesNull),
 		("testCanReturnRows", testCanReturnRows),
+		("testHandlesIntegerParameters", testHandlesIntegerParameters),
+		("testHandlesIntegerParameters_2", testHandlesIntegerParameters_2),
 	]
 }
