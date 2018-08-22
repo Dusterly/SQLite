@@ -19,8 +19,17 @@ class FireflyTests: XCTestCase {
 		_ = try Connection(path: pathToTestDB)
 	}
 
+	func testFindsTheCrew() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result = connection.scalar(executing: "select count(*) from Crew")
+
+		XCTAssertEqual(result, 8)
+	}
+
 	static let allTests = [
 		("testThrowsIfDatabaseDoesNotExist", testThrowsIfDatabaseDoesNotExist),
 		("testConnectsToExistingDatabase", testConnectsToExistingDatabase),
+		("testFindsTheCrew", testFindsTheCrew),
 	]
 }
