@@ -53,9 +53,10 @@ class FireflyTests: XCTestCase {
 	func testHandlesNull() throws {
 		let connection = try Connection(path: pathToTestDB)
 
-		let result: String? = try connection.scalar(executing: "select null")
-
-		XCTAssertNil(result)
+		XCTAssertNil(connection.scalar(executing: "select null") as Int?)
+		XCTAssertNil(connection.scalar(executing: "select null") as Double?)
+		XCTAssertNil(connection.scalar(executing: "select null") as String?)
+		XCTAssertNil(connection.scalar(executing: "select null") as Data?)
 	}
 
 	static let allTests = [
