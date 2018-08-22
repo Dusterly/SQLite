@@ -9,9 +9,11 @@ import Libsqlite3Linux
 public struct Statement {
 	let pointer: OpaquePointer
 
-	init(connection: Connection, query: String, parameters: [Parameter]) {
+	init(connection: Connection, query: String, parameters: [Parameter]) throws {
 		var pointer: OpaquePointer?
-		sqlite3_prepare_v2(connection.pointer, query, Int32(query.utf8.count), &pointer, nil)
+		let result = sqlite3_prepare_v2(connection.pointer, query, Int32(query.utf8.count), &pointer, nil)
+
+		guard result == SQLITE_OK else { throw SQLiteError.error }
 		self.pointer = pointer!
 
 		for (index, parameter) in parameters.enumerated() {

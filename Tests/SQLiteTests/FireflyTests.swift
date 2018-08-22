@@ -16,34 +16,34 @@ class FireflyTests: XCTestCase {
 // swiftlint:enable force_try
 
 	func testFindsTheCrew() throws {
-		let result: Int? = connection.scalar(executing: "select count(*) from Crew")
+		let result: Int? = try connection.scalar(executing: "select count(*) from Crew")
 
 		XCTAssertEqual(result, 8)
 	}
 
 	func testHandlesText() throws {
-		let result: String? = connection.scalar(executing: "select 'Hey, Kaylee'")
+		let result: String? = try connection.scalar(executing: "select 'Hey, Kaylee'")
 
 		XCTAssertEqual(result, "Hey, Kaylee")
 	}
 
 	func testHandlesBlob() throws {
-		let result: Data? = connection.scalar(executing: "select data from TestData where data is not null")
+		let result: Data? = try connection.scalar(executing: "select data from TestData where data is not null")
 
 		XCTAssertEqual(result, "data_only".data(using: .ascii))
 	}
 
 	func testHandlesReal() throws {
-		let result: Double? = connection.scalar(executing: "select 3.0")
+		let result: Double? = try connection.scalar(executing: "select 3.0")
 
 		XCTAssertEqual(result, 3.0)
 	}
 
 	func testHandlesNull() throws {
-		XCTAssertNil(connection.scalar(executing: "select null") as Int?)
-		XCTAssertNil(connection.scalar(executing: "select null") as Double?)
-		XCTAssertNil(connection.scalar(executing: "select null") as String?)
-		XCTAssertNil(connection.scalar(executing: "select null") as Data?)
+		XCTAssertNil(try connection.scalar(executing: "select null") as Int?)
+		XCTAssertNil(try connection.scalar(executing: "select null") as Double?)
+		XCTAssertNil(try connection.scalar(executing: "select null") as String?)
+		XCTAssertNil(try connection.scalar(executing: "select null") as Data?)
 	}
 
 	func testCanReturnRows() throws {
@@ -57,7 +57,7 @@ class FireflyTests: XCTestCase {
 	}
 
 	func testHandlesIntegerParameters() throws {
-		let result: Int? = connection.scalar(executing: "select ?", 4)
+		let result: Int? = try connection.scalar(executing: "select ?", 4)
 
 		XCTAssertEqual(result, 4)
 	}
@@ -73,13 +73,13 @@ class FireflyTests: XCTestCase {
 	}
 
 	func testHandlesDoubleParameters() throws {
-		let result: Int? = connection.scalar(executing: "select count(*) from TestData where double = ?", 3.0)
+		let result: Int? = try connection.scalar(executing: "select count(*) from TestData where double = ?", 3.0)
 
 		XCTAssertEqual(result, 1)
 	}
 
 	func testHandlesDataParameters() throws {
-		let result: Int? = connection.scalar(executing:
+		let result: Int? = try connection.scalar(executing:
 			"select count(*) from TestData where data = ?", "data_only".data(using: .ascii)!)
 
 		XCTAssertEqual(result, 1)
@@ -95,6 +95,10 @@ class FireflyTests: XCTestCase {
 		XCTAssertEqual(row["role"] as? String, "Mechanic")
 	}
 
+	func testThrowsIfInvalidStatement() {
+		XCTAssertThrowsError(try connection.resultSet(executing: "select * from Crew where name = ", "Kaylee"))
+	}
+
 	static let allTests = [
 		("testFindsTheCrew", testFindsTheCrew),
 		("testHandlesText", testHandlesText),
@@ -107,5 +111,6 @@ class FireflyTests: XCTestCase {
 		("testHandlesDoubleParameters", testHandlesDoubleParameters),
 		("testHandlesDataParameters", testHandlesDataParameters),
 		("testHandlesStringParameters", testHandlesStringParameters),
+		("testThrowsIfInvalidStatement", testThrowsIfInvalidStatement),
 	]
 }
