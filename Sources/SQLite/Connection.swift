@@ -21,18 +21,13 @@ public class Connection {
 	public func scalar<T: ResultValue>(executing query: String) -> T? {
 		let stmtPointer = pointer(preparing: query)
 		sqlite3_step(stmtPointer)
-		return value(at: 0, stmtPointer: stmtPointer)
+		return ResultRow(stmtPointer: stmtPointer).value(at: 0)
 	}
 
 	private func pointer(preparing query: String) -> OpaquePointer {
 		var stmtPointer: OpaquePointer?
 		sqlite3_prepare_v2(pointer, query, Int32(query.utf8.count), &stmtPointer, nil)
 		return stmtPointer!
-	}
-
-	private func value<T: ResultValue>(at index: Int, stmtPointer: OpaquePointer) -> T? {
-		guard sqlite3_column_type(stmtPointer, 0) != SQLITE_NULL else { return nil }
-		return T(stmt: stmtPointer, index: 0)
 	}
 }
 
