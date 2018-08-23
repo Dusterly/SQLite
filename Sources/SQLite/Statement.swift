@@ -6,16 +6,16 @@ import Libsqlite3Mac
 import Libsqlite3Linux
 #endif
 
-struct Statement {
+public struct Statement {
 	let pointer: OpaquePointer
 
-	init(connection: Connection, query: String, parameters: [Int]) {
+	init(connection: Connection, query: String, parameters: [Parameter]) {
 		var pointer: OpaquePointer?
 		sqlite3_prepare_v2(connection.pointer, query, Int32(query.utf8.count), &pointer, nil)
 		self.pointer = pointer!
 
 		for (index, parameter) in parameters.enumerated() {
-			sqlite3_bind_int64(pointer, Int32(index + 1), Int64(parameter))
+			_ = parameter.bind(to: self, at: Int32(index + 1))
 		}
 	}
 

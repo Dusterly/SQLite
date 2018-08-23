@@ -91,6 +91,35 @@ class FireflyTests: XCTestCase {
 		XCTAssertEqual(row["role"] as? String, "Mechanic")
 	}
 
+	func testHandlesDoubleParameters() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result: Int? = connection.scalar(executing: "select count(*) from TestData where double = ?", 3.0)
+
+		XCTAssertEqual(result, 1)
+	}
+
+	func testHandlesDataParameters() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result: Int? = connection.scalar(executing:
+			"select count(*) from TestData where data = ?", "data_only".data(using: .ascii)!)
+
+		XCTAssertEqual(result, 1)
+	}
+
+	func testHandlesStringParameters() throws {
+		let connection = try Connection(path: pathToTestDB)
+
+		let result = try connection.resultSet(executing: "select * from Crew where name = ?", "Kaylee")
+
+		XCTAssertEqual(result.count, 1)
+
+		guard let row = result.first else { return XCTFail("no rows") }
+		XCTAssertEqual(row["name"] as? String, "Kaylee")
+		XCTAssertEqual(row["role"] as? String, "Mechanic")
+	}
+
 	static let allTests = [
 		("testThrowsIfDatabaseDoesNotExist", testThrowsIfDatabaseDoesNotExist),
 		("testConnectsToExistingDatabase", testConnectsToExistingDatabase),
@@ -102,5 +131,8 @@ class FireflyTests: XCTestCase {
 		("testCanReturnRows", testCanReturnRows),
 		("testHandlesIntegerParameters", testHandlesIntegerParameters),
 		("testHandlesIntegerParameters_2", testHandlesIntegerParameters_2),
+		("testHandlesDoubleParameters", testHandlesDoubleParameters),
+		("testHandlesDataParameters", testHandlesDataParameters),
+		("testHandlesStringParameters", testHandlesStringParameters),
 	]
 }

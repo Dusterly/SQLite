@@ -19,12 +19,12 @@ public class Connection {
 		self.pointer = pointer!
 	}
 
-	public func scalar<T: ResultValue>(executing query: String, _ parameters: Int...) -> T? {
+	public func scalar<T: ResultValue>(executing query: String, _ parameters: Parameter...) -> T? {
 		let statement = Statement(connection: self, query: query, parameters: parameters)
 		return statement.scalar()
 	}
 
-	public func resultSet(executing query: String, _ parameters: Int...) throws -> [[String: ResultValue]] {
+	public func resultSet(executing query: String, _ parameters: Parameter...) throws -> [[String: ResultValue]] {
 		let statement = Statement(connection: self, query: query, parameters: parameters)
 		return try statement.resultSet()
 	}
