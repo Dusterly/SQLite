@@ -7,6 +7,8 @@ import Libsqlite3Mac
 import Libsqlite3Linux
 #endif
 
+public typealias ResultSet = [[String: ResultValue]]
+
 public class Connection {
 	let pointer: OpaquePointer
 
@@ -24,7 +26,7 @@ public class Connection {
 		return statement.scalar()
 	}
 
-	public func resultSet(executing query: String, _ parameters: Parameter...) throws -> [[String: ResultValue]] {
+	public func resultSet(executing query: String, _ parameters: Parameter...) throws -> ResultSet {
 		let statement = try Statement(connection: self, query: query, parameters: parameters)
 		return try statement.resultSet()
 	}
