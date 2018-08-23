@@ -8,14 +8,16 @@ import Libsqlite3Linux
 
 public struct Statement {
 	let pointer: OpaquePointer
+	private let connection: Connection
 
 	init(connection: Connection, query: String, parameters: [Parameter]) throws {
 		var pointer: OpaquePointer?
 		let result = sqlite3_prepare_v2(connection.pointer, query, Int32(query.utf8.count), &pointer, nil)
 
-		guard result == SQLITE_OK else { throw SQLiteError.error }
+		guard result == SQLITE_OK else { throw connection.lastError() }
 // swiftlint:disable force_unwrapping
 		self.pointer = pointer!
+		self.connection = connection
 // swiftlint:enable force_unwrapping
 
 		for (index, parameter) in parameters.enumerated() {
@@ -25,13 +27,13 @@ public struct Statement {
 
 	func scalar<T: ResultValue>() -> T? {
 		sqlite3_step(pointer)
-		return ResultRow(stmtPointer: pointer).value(at: 0)
+		return ResultRow(stmtPointer: pointer, connection: connection).value(at: 0)
 	}
 
 	func resultSet() throws -> [[String: ResultValue]] {
 		var result: [[String: ResultValue]] = []
 		while sqlite3_step(pointer) == SQLITE_ROW {
-			let row = ResultRow(stmtPointer: pointer)
+			let row = ResultRow(stmtPointer: pointer, connection: connection)
 			result.append(try row.columnValues())
 		}
 

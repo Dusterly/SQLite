@@ -8,6 +8,7 @@ import Libsqlite3Linux
 
 struct ResultRow {
 	let stmtPointer: OpaquePointer
+	let connection: Connection
 
 	func columnValues() throws -> [String: ResultValue] {
 		return Dictionary(uniqueKeysWithValues: try columnValuePairs().compactMap {
@@ -18,7 +19,7 @@ struct ResultRow {
 
 	private func columnValuePairs() throws -> [(String, ResultValue?)] {
 		return try (0..<sqlite3_column_count(stmtPointer)).compactMap { index in
-			guard let columnName = columnName(at: index) else { throw SQLiteError.unknown }
+			guard let columnName = columnName(at: index) else { throw connection.lastError() }
 			return (columnName, try value(at: index))
 		}
 	}
@@ -44,7 +45,7 @@ struct ResultRow {
 		case SQLITE_TEXT: return String.self
 		case SQLITE_BLOB: return Data.self
 		case SQLITE_NULL: return nil
-		default: throw SQLiteError.unknown
+		default: throw SQLiteError.generic
 		}
 	}
 }

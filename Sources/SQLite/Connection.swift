@@ -16,7 +16,7 @@ public class Connection {
 		var pointer: OpaquePointer?
 		let result = sqlite3_open_v2(path, &pointer, SQLITE_OPEN_READONLY, nil)
 
-		guard result == SQLITE_OK else { throw SQLiteError.error }
+		guard result == SQLITE_OK else { throw SQLiteError.fromConnection(pointer: pointer!) }
 
 		self.pointer = pointer!
 	}
@@ -30,9 +30,18 @@ public class Connection {
 		let statement = try Statement(connection: self, query: query, parameters: parameters)
 		return try statement.resultSet()
 	}
+
+	func lastError() -> SQLiteError {
+		return .fromConnection(pointer: pointer)
+	}
 }
 
 enum SQLiteError: Error {
-	case error
-	case unknown
+	case generic
+	case message(String)
+
+	fileprivate static func fromConnection(pointer: OpaquePointer) -> SQLiteError {
+		guard let message = String(validatingUTF8: sqlite3_errmsg(pointer)) else { return .generic }
+		return .message(message)
+	}
 }
