@@ -9,19 +9,22 @@ import Libsqlite3Linux
 struct ResultRow {
 	let stmtPointer: OpaquePointer
 
-	func values() throws -> [String: ResultValue] {
-		let columnCount = sqlite3_column_count(stmtPointer)
-		var row: [String: ResultValue] = [:]
-
-		for index in 0..<columnCount {
-			guard let columnName = columnName(at: index) else { continue }
-			guard let datatype = try datatype(at: index) else { continue }
-			row[columnName] = value(at: index, as: datatype)
-		}
-		return row
+	func columnValues() throws -> [String: ResultValue] {
+		return Dictionary(uniqueKeysWithValues: try columnValuePairs().compactMap {
+			guard let value = $1 else { return nil }
+			return ($0, value)
+		})
 	}
 
-	private func value(at index: Int32, as datatype: ResultValue.Type) -> ResultValue {
+	private func columnValuePairs() throws -> [(String, ResultValue?)] {
+		return try (0..<sqlite3_column_count(stmtPointer)).compactMap { index in
+			guard let columnName = columnName(at: index) else { throw SQLiteError.unknown }
+			return (columnName, try value(at: index))
+		}
+	}
+
+	private func value(at index: Int32) throws -> ResultValue? {
+		guard let datatype = try datatype(at: index) else { return nil }
 		return datatype.init(stmt: stmtPointer, index: index)
 	}
 

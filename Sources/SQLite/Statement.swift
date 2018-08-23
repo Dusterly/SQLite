@@ -32,7 +32,7 @@ public struct Statement {
 		var result: [[String: ResultValue]] = []
 		while sqlite3_step(pointer) == SQLITE_ROW {
 			let row = ResultRow(stmtPointer: pointer)
-			result.append(try row.values())
+			result.append(try row.columnValues())
 		}
 
 		return result
