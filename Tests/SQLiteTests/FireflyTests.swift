@@ -103,6 +103,14 @@ class FireflyTests: XCTestCase {
 		XCTAssertEqual(result, 42)
 	}
 
+	func testReturnsTheLastInsertedID() throws {
+		try connection.execute("create table Test ( id Integer primary key autoincrement, answer Integer )")
+
+		let result = try connection.insertedID(executing: "insert into Test values (null, 43)")
+
+		XCTAssertEqual(1, result)
+	}
+
 	static let allTests = [
 		("testFindsTheCrew", testFindsTheCrew),
 		("testHandlesText", testHandlesText),
@@ -117,5 +125,6 @@ class FireflyTests: XCTestCase {
 		("testHandlesStringParameters", testHandlesStringParameters),
 		("testThrowsIfInvalidStatement", testThrowsIfInvalidStatement),
 		("testExecutesStatements", testExecutesStatements),
+		("testReturnsTheLastInsertedID", testReturnsTheLastInsertedID),
 	]
 }

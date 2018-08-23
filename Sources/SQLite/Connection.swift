@@ -12,6 +12,10 @@ public typealias ResultSet = [[String: ResultValue]]
 public class Connection {
 	let pointer: OpaquePointer
 
+	private var lastInsertedID: Int {
+		return Int(sqlite3_last_insert_rowid(pointer))
+	}
+
 	public init(path: String) throws {
 		var pointer: OpaquePointer?
 		let result = sqlite3_open_v2(path, &pointer, SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil)
@@ -22,6 +26,16 @@ public class Connection {
 	}
 
 	public func execute(_ statement: String, _ parameters: Parameter...) throws {
+		let statement = try Statement(connection: self, query: statement, parameters: parameters)
+		try statement.execute()
+	}
+
+	public func insertedID(executing statement: String, _ parameters: Parameter...) throws -> Int {
+		try execute(statement, parameters: parameters)
+		return lastInsertedID
+	}
+
+	private func execute(_ statement: String, parameters: [Parameter]) throws {
 		let statement = try Statement(connection: self, query: statement, parameters: parameters)
 		try statement.execute()
 	}
