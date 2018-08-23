@@ -21,7 +21,7 @@ public struct Enactment {
 // swiftlint:enable force_unwrapping
 
 		for (index, parameter) in parameters.enumerated() {
-			_ = parameter.bind(to: self, at: Int32(index + 1))
+			try parameter.apply(to: self, at: index + 1, for: connection)
 		}
 	}
 
