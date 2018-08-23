@@ -14,7 +14,7 @@ public class Connection {
 		var pointer: OpaquePointer?
 		let result = sqlite3_open_v2(path, &pointer, SQLITE_OPEN_READONLY, nil)
 
-		guard [SQLITE_OK, SQLITE_ROW, SQLITE_DONE].contains(result) else { throw SQLiteError.error }
+		guard result == SQLITE_OK else { throw SQLiteError.error }
 
 		self.pointer = pointer!
 	}
