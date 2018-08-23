@@ -15,6 +15,10 @@ class FireflyTests: XCTestCase {
 	private let connection = try! Connection(path: pathToTestDB)
 // swiftlint:enable force_try
 
+	override func tearDown() {
+		_ = try? connection.execute("drop table if exists Test")
+	}
+
 	func testFindsTheCrew() throws {
 		let result: Int? = try connection.scalar(executing: "select count(*) from Crew")
 
@@ -72,8 +76,8 @@ class FireflyTests: XCTestCase {
 	}
 
 	func testHandlesDataParameters() throws {
-		let result: Int? = try connection.scalar(executing:
 // swiftlint:disable force_unwrapping
+		let result: Int? = try connection.scalar(executing:
 			"select count(*) from TestData where data = ?", "data_only".data(using: .ascii)!)
 // swiftlint:enable force_unwrapping
 
@@ -90,6 +94,15 @@ class FireflyTests: XCTestCase {
 		XCTAssertThrowsError(try connection.resultSet(executing: "select * from Crew where name = ", "Kaylee"))
 	}
 
+	func testExecutesStatements() throws {
+		try connection.execute("create table Test ( answer Integer )")
+		try connection.execute("insert into Test values (?)", 42)
+
+		let result: Int? = try connection.scalar(executing: "select * from Test")
+
+		XCTAssertEqual(result, 42)
+	}
+
 	static let allTests = [
 		("testFindsTheCrew", testFindsTheCrew),
 		("testHandlesText", testHandlesText),
@@ -103,5 +116,6 @@ class FireflyTests: XCTestCase {
 		("testHandlesDataParameters", testHandlesDataParameters),
 		("testHandlesStringParameters", testHandlesStringParameters),
 		("testThrowsIfInvalidStatement", testThrowsIfInvalidStatement),
+		("testExecutesStatements", testExecutesStatements),
 	]
 }

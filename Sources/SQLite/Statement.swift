@@ -25,7 +25,12 @@ public struct Statement {
 		}
 	}
 
+	func execute() throws {
+		guard sqlite3_step(pointer) == SQLITE_DONE else { throw connection.lastError() }
+	}
+
 	func scalar<T: ResultValue>() -> T? {
+		defer { sqlite3_finalize(pointer) }
 		sqlite3_step(pointer)
 		return ResultRow(stmtPointer: pointer, connection: connection).value(at: 0)
 	}
