@@ -25,6 +25,8 @@ public class Connection {
 		self.pointer = pointer!
 	}
 
+	deinit { sqlite3_close(pointer) }
+
 	public func execute(_ statement: String, _ parameters: Parameter...) throws {
 		let statement = try Statement(connection: self, query: statement, parameters: parameters)
 		try statement.execute()
