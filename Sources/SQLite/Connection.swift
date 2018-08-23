@@ -28,7 +28,7 @@ public class Connection {
 
 	public func scalar<T: ResultValue>(executing query: String, _ parameters: Parameter...) throws -> T? {
 		let statement = try Statement(connection: self, query: query, parameters: parameters)
-		return statement.scalar()
+		return try statement.scalar()
 	}
 
 	public func resultSet(executing query: String, _ parameters: Parameter...) throws -> ResultSet {
