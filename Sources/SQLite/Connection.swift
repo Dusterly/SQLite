@@ -27,29 +27,29 @@ public class Connection {
 
 	deinit { sqlite3_close(pointer) }
 
-	public func execute(_ statement: String, _ parameters: Parameter...) throws {
-		let statement = try Statement(connection: self, query: statement, parameters: parameters)
-		try statement.execute()
+	public func execute(_ enactment: String, _ parameters: Parameter...) throws {
+		let enactment = try Enactment(connection: self, query: enactment, parameters: parameters)
+		try enactment.execute()
 	}
 
-	public func insertedID(executing statement: String, _ parameters: Parameter...) throws -> Int {
-		try execute(statement, parameters: parameters)
+	public func insertedID(executing enactment: String, _ parameters: Parameter...) throws -> Int {
+		try execute(enactment, parameters: parameters)
 		return lastInsertedID
 	}
 
-	private func execute(_ statement: String, parameters: [Parameter]) throws {
-		let statement = try Statement(connection: self, query: statement, parameters: parameters)
-		try statement.execute()
+	private func execute(_ enactment: String, parameters: [Parameter]) throws {
+		let enactment = try Enactment(connection: self, query: enactment, parameters: parameters)
+		try enactment.execute()
 	}
 
 	public func scalar<T: ResultValue>(executing query: String, _ parameters: Parameter...) throws -> T? {
-		let statement = try Statement(connection: self, query: query, parameters: parameters)
-		return try statement.scalar()
+		let enactment = try Enactment(connection: self, query: query, parameters: parameters)
+		return try enactment.scalar()
 	}
 
 	public func resultSet(executing query: String, _ parameters: Parameter...) throws -> ResultSet {
-		let statement = try Statement(connection: self, query: query, parameters: parameters)
-		return try statement.resultSet()
+		let enactment = try Enactment(connection: self, query: query, parameters: parameters)
+		return try enactment.resultSet()
 	}
 
 	func lastError() -> SQLiteError {
