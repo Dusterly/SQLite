@@ -47,13 +47,10 @@ class FireflyTests: XCTestCase {
 	}
 
 	func testCanReturnRows() throws {
-		let result = try connection.resultSet(executing: "select * from Crew")
+		let result = try connection.resultSet(executing: "select name, role from Crew")
 
 		XCTAssertEqual(result.count, 8)
-
-		guard let row = result.first else { return XCTFail("no rows") }
-		XCTAssertEqual(row["name"] as? String, "Mal")
-		XCTAssertEqual(row["role"] as? String, "Captain")
+		XCTAssertEqual(result.first as? [String: String], ["name": "Mal", "role": "Captain"])
 	}
 
 	func testHandlesIntegerParameters() throws {
@@ -63,13 +60,9 @@ class FireflyTests: XCTestCase {
 	}
 
 	func testHandlesIntegerParameters_2() throws {
-		let result = try connection.resultSet(executing: "select * from Crew where id = ?", 4)
+		let result = try connection.resultSet(executing: "select name, role from Crew where id = ?", 4)
 
-		XCTAssertEqual(result.count, 1)
-
-		guard let row = result.first else { return XCTFail("no rows") }
-		XCTAssertEqual(row["name"] as? String, "Kaylee")
-		XCTAssertEqual(row["role"] as? String, "Mechanic")
+		XCTAssertEqual(result as? [[String: String]], [["name": "Kaylee", "role": "Mechanic"]])
 	}
 
 	func testHandlesDoubleParameters() throws {
@@ -88,13 +81,9 @@ class FireflyTests: XCTestCase {
 	}
 
 	func testHandlesStringParameters() throws {
-		let result = try connection.resultSet(executing: "select * from Crew where name = ?", "Kaylee")
+		let result = try connection.resultSet(executing: "select name, role from Crew where name = ?", "Kaylee")
 
-		XCTAssertEqual(result.count, 1)
-
-		guard let row = result.first else { return XCTFail("no rows") }
-		XCTAssertEqual(row["name"] as? String, "Kaylee")
-		XCTAssertEqual(row["role"] as? String, "Mechanic")
+		XCTAssertEqual(result as? [[String: String]], [["name": "Kaylee", "role": "Mechanic"]])
 	}
 
 	func testThrowsIfInvalidStatement() {
