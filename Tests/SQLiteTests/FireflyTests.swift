@@ -80,7 +80,9 @@ class FireflyTests: XCTestCase {
 
 	func testHandlesDataParameters() throws {
 		let result: Int? = try connection.scalar(executing:
+// swiftlint:disable force_unwrapping
 			"select count(*) from TestData where data = ?", "data_only".data(using: .ascii)!)
+// swiftlint:enable force_unwrapping
 
 		XCTAssertEqual(result, 1)
 	}

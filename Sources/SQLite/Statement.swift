@@ -14,7 +14,9 @@ public struct Statement {
 		let result = sqlite3_prepare_v2(connection.pointer, query, Int32(query.utf8.count), &pointer, nil)
 
 		guard result == SQLITE_OK else { throw SQLiteError.error }
+// swiftlint:disable force_unwrapping
 		self.pointer = pointer!
+// swiftlint:enable force_unwrapping
 
 		for (index, parameter) in parameters.enumerated() {
 			_ = parameter.bind(to: self, at: Int32(index + 1))
