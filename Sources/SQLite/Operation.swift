@@ -12,7 +12,7 @@ public struct Operation {
 
 	init(connection: Connection, query: String, parameters: [Parameter]) throws {
 		var pointer: OpaquePointer?
-		let result = sqlite3_prepare_v2(connection.pointer, query, Int32(query.utf8.count), &pointer, nil)
+		let result = sqlite3_prepare_v2(connection.connPointer, query, Int32(query.utf8.count), &pointer, nil)
 
 		guard result == SQLITE_OK else { throw connection.lastError() }
 // swiftlint:disable force_unwrapping

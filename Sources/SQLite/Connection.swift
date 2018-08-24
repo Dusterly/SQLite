@@ -9,17 +9,17 @@ import Libsqlite3Linux
 public typealias ResultSet = [[String: ResultValue]]
 
 public class Connection {
-	let pointer: OpaquePointer
+	let connPointer: OpaquePointer
 
 	private var lastInsertedID: Int {
-		return Int(sqlite3_last_insert_rowid(pointer))
+		return Int(sqlite3_last_insert_rowid(connPointer))
 	}
 
 	public init(path: String) throws {
-		self.pointer = try pointerToOpenedDatabase(atPath: path)
+		connPointer = try pointer(openingDatabaseAtPath: path)
 	}
 
-	deinit { sqlite3_close(pointer) }
+	deinit { sqlite3_close(connPointer) }
 
 	public func execute(_ statement: String, _ parameters: Parameter...) throws {
 		let operation = try Operation(connection: self, query: statement, parameters: parameters)
@@ -47,7 +47,7 @@ public class Connection {
 	}
 
 	func lastError() -> SQLiteError {
-		return sqliteError(messageFrom: pointer)
+		return sqliteError(messageFrom: connPointer)
 	}
 }
 
@@ -56,7 +56,7 @@ enum SQLiteError: Error {
 	case message(String)
 }
 
-private func pointerToOpenedDatabase(atPath path: String) throws -> OpaquePointer {
+private func pointer(openingDatabaseAtPath path: String) throws -> OpaquePointer {
 	var openedPointer: OpaquePointer?
 	let result = sqlite3_open_v2(path, &openedPointer, SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil)
 	guard let pointer = openedPointer, result == SQLITE_OK else { throw sqliteError(messageFrom: openedPointer) }
