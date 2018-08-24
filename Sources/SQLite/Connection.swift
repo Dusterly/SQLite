@@ -1,4 +1,3 @@
-// swiftlint:disable force_unwrapping
 import Foundation
 
 #if os(macOS)
@@ -17,12 +16,7 @@ public class Connection {
 	}
 
 	public init(path: String) throws {
-		var pointer: OpaquePointer?
-		let result = sqlite3_open_v2(path, &pointer, SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil)
-
-		guard result == SQLITE_OK else { throw sqliteError(messageFrom: pointer) }
-
-		self.pointer = pointer!
+		self.pointer = try pointerToOpenedDatabase(atPath: path)
 	}
 
 	deinit { sqlite3_close(pointer) }
@@ -60,6 +54,13 @@ public class Connection {
 enum SQLiteError: Error {
 	case generic
 	case message(String)
+}
+
+private func pointerToOpenedDatabase(atPath path: String) throws -> OpaquePointer {
+	var openedPointer: OpaquePointer?
+	let result = sqlite3_open_v2(path, &openedPointer, SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX, nil)
+	guard let pointer = openedPointer, result == SQLITE_OK else { throw sqliteError(messageFrom: openedPointer) }
+	return pointer
 }
 
 private func sqliteError(messageFrom pointer: OpaquePointer?) -> SQLiteError {
