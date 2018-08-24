@@ -6,7 +6,7 @@ import Libsqlite3Mac
 import Libsqlite3Linux
 #endif
 
-public struct Enactment {
+public struct Operation {
 	let pointer: OpaquePointer
 	private let connection: Connection
 
