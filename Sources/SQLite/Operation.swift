@@ -11,14 +11,8 @@ public struct Operation {
 	private let connection: Connection
 
 	init(connection: Connection, query: String, parameters: [Parameter]) throws {
-		var pointer: OpaquePointer?
-		let result = sqlite3_prepare_v2(connection.connPointer, query, Int32(query.utf8.count), &pointer, nil)
-
-		guard result == SQLITE_OK else { throw connection.lastError() }
-// swiftlint:disable force_unwrapping
-		self.stmtPointer = pointer!
+		self.stmtPointer = try pointer(preparingQuery: query, connection: connection)
 		self.connection = connection
-// swiftlint:enable force_unwrapping
 
 		for (index, parameter) in parameters.enumerated() {
 			try parameter.apply(to: self, at: index + 1, for: connection)
@@ -44,4 +38,12 @@ public struct Operation {
 
 		return result
 	}
+}
+
+private func pointer(preparingQuery query: String, connection: Connection) throws -> OpaquePointer {
+	var stmtPointer: OpaquePointer?
+	let result = sqlite3_prepare_v2(connection.connPointer, query, Int32(query.utf8.count), &stmtPointer, nil)
+	guard result == SQLITE_OK else { throw connection.lastError() }
+	guard let pointer = stmtPointer, result == SQLITE_OK else { throw connection.lastError() }
+	return pointer
 }
