@@ -31,12 +31,12 @@ struct ResultRow {
 
 	private func value(at index: Int32) throws -> ResultValue? {
 		guard let datatype = try datatype(at: index) else { return nil }
-		return datatype.init(stmt: operation.stmtPointer, index: index)
+		return datatype.init(operation: operation, index: index)
 	}
 
 	func value<T: ResultValue>(at index: Int32) -> T? {
 		guard sqlite3_column_type(operation.stmtPointer, index) != SQLITE_NULL else { return nil }
-		return T(stmt: operation.stmtPointer, index: index)
+		return T(operation: operation, index: index)
 	}
 
 	private func columnName(at index: Int32) -> String? {
