@@ -32,13 +32,13 @@ public struct Operation {
 	func scalar<T: ResultValue>() throws -> T? {
 		guard sqlite3_step(stmtPointer) == SQLITE_ROW else { throw connection.lastError() }
 		defer { sqlite3_finalize(stmtPointer) }
-		return ResultRow(stmtPointer: stmtPointer, connection: connection).value(at: 0)
+		return ResultRow(operation: self, connection: connection).value(at: 0)
 	}
 
 	func resultSet() throws -> [[String: ResultValue]] {
 		var result: [[String: ResultValue]] = []
 		while sqlite3_step(stmtPointer) == SQLITE_ROW {
-			let row = ResultRow(stmtPointer: stmtPointer, connection: connection)
+			let row = ResultRow(operation: self, connection: connection)
 			result.append(try row.columnValues())
 		}
 
