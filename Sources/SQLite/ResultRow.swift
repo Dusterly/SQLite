@@ -30,8 +30,8 @@ struct ResultRow {
 	}
 
 	private func value(at index: Int32) throws -> ResultValue? {
-		guard let datatype = try datatype(at: index) else { return nil }
-		return datatype.init(operation: operation, index: index)
+		guard let type = try type(ofColumnAt: index) else { return nil }
+		return type.init(operation: operation, index: index)
 	}
 
 	func value<T: ResultValue>(at index: Int32) -> T? {
@@ -43,7 +43,7 @@ struct ResultRow {
 		return String(validatingUTF8: sqlite3_column_name(operation.stmtPointer, index))
 	}
 
-	private func datatype(at index: Int32) throws -> ResultValue.Type? {
+	private func type(ofColumnAt index: Int32) throws -> ResultValue.Type? {
 		switch sqlite3_column_type(operation.stmtPointer, index) {
 		case SQLITE_INTEGER: return Int.self
 		case SQLITE_FLOAT: return Double.self
