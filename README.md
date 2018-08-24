@@ -1,3 +1,5 @@
 # SQLite
 
-A description of this package.
+Swift wrapper for the sqlite3 C API
+
+Supports Mac and Linux (Ubuntu)
