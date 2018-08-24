@@ -7,7 +7,7 @@ import Libsqlite3Linux
 #endif
 
 public struct Operation {
-	let pointer: OpaquePointer
+	let stmtPointer: OpaquePointer
 	private let connection: Connection
 
 	init(connection: Connection, query: String, parameters: [Parameter]) throws {
@@ -16,7 +16,7 @@ public struct Operation {
 
 		guard result == SQLITE_OK else { throw connection.lastError() }
 // swiftlint:disable force_unwrapping
-		self.pointer = pointer!
+		self.stmtPointer = pointer!
 		self.connection = connection
 // swiftlint:enable force_unwrapping
 
@@ -26,19 +26,19 @@ public struct Operation {
 	}
 
 	func execute() throws {
-		guard sqlite3_step(pointer) == SQLITE_DONE else { throw connection.lastError() }
+		guard sqlite3_step(stmtPointer) == SQLITE_DONE else { throw connection.lastError() }
 	}
 
 	func scalar<T: ResultValue>() throws -> T? {
-		guard sqlite3_step(pointer) == SQLITE_ROW else { throw connection.lastError() }
-		defer { sqlite3_finalize(pointer) }
-		return ResultRow(stmtPointer: pointer, connection: connection).value(at: 0)
+		guard sqlite3_step(stmtPointer) == SQLITE_ROW else { throw connection.lastError() }
+		defer { sqlite3_finalize(stmtPointer) }
+		return ResultRow(stmtPointer: stmtPointer, connection: connection).value(at: 0)
 	}
 
 	func resultSet() throws -> [[String: ResultValue]] {
 		var result: [[String: ResultValue]] = []
-		while sqlite3_step(pointer) == SQLITE_ROW {
-			let row = ResultRow(stmtPointer: pointer, connection: connection)
+		while sqlite3_step(stmtPointer) == SQLITE_ROW {
+			let row = ResultRow(stmtPointer: stmtPointer, connection: connection)
 			result.append(try row.columnValues())
 		}
 
