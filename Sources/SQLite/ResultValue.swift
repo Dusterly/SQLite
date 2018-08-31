@@ -1,11 +1,6 @@
 // swiftlint:disable force_unwrapping
 import Foundation
-
-#if os(macOS)
-import Libsqlite3Mac
-#else
-import Libsqlite3Linux
-#endif
+import Libsqlite3
 
 public protocol ResultValue {
 	init(operation: Operation, index: Int32)

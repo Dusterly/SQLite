@@ -1,10 +1,5 @@
 import Foundation
-
-#if os(macOS)
-import Libsqlite3Mac
-#else
-import Libsqlite3Linux
-#endif
+import Libsqlite3
 
 public protocol Parameter {
 	func statusCode(applyingTo operation: Operation, at index: Int32) -> Int32

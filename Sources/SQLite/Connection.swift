@@ -1,10 +1,5 @@
 import Foundation
-
-#if os(macOS)
-import Libsqlite3Mac
-#else
-import Libsqlite3Linux
-#endif
+import Libsqlite3
 
 public typealias ResultSet = [[String: ResultValue]]
 

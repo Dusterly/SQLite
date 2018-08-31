@@ -16,15 +16,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Libsqlite3Mac",
-            dependencies: []),
-        .target(
-            name: "Libsqlite3Linux",
+            name: "Libsqlite3",
             dependencies: []),
 
         .target(
             name: "SQLite",
-            dependencies: ["Libsqlite3Linux", "Libsqlite3Mac"]),
+            dependencies: ["Libsqlite3"]),
         .testTarget(
             name: "SQLiteTests",
             dependencies: ["SQLite"]),
